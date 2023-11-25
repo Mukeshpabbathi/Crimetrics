@@ -1,15 +1,26 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { SiShopware } from 'react-icons/si';
+import { AiOutlineUser } from 'react-icons/ai';
 import { MdOutlineCancel } from 'react-icons/md';
 import { TooltipComponent } from '@syncfusion/ej2-react-popups';
+import { useState } from 'react';
 
 import { links } from '../data/dummy';
 import { useStateContext } from '../contexts/ContextProvider';
 
+
 const Sidebar = () => {
   const { currentColor, activeMenu, setActiveMenu, screenSize } = useStateContext();
+  const [isLoggedIn, setIsLoggedIn] = useState(window.localStorage.getItem("loggedin") === "TRUE");
 
+  const handleLogout = () => {
+    // Perform logout actions
+    alert("Logged Out Successfully!!!")
+    window.localStorage.removeItem("loggedin");
+    setIsLoggedIn(false);
+  };
+  
   const handleCloseSideBar = () => {
     if (activeMenu !== undefined && screenSize <= 900) {
       setActiveMenu(false);
@@ -60,6 +71,21 @@ const Sidebar = () => {
                 ))}
               </div>
             ))}
+            <p className="text-gray-400 dark:text-gray-400 m-3 mt-4 uppercase">
+                 USER
+                </p>
+            {!isLoggedIn && (
+              <NavLink to="/login" onClick={handleCloseSideBar} className={normalLink}>
+                <AiOutlineUser />
+                <span className="capitalize">Login</span>
+              </NavLink>
+            )}
+            {isLoggedIn && (
+              <button onClick={handleLogout} className={normalLink}>
+                <AiOutlineUser />
+                <span className="capitalize">Logout</span>
+              </button>
+            )}
           </div>
         </>
       )}

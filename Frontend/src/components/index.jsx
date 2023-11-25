@@ -14,4 +14,7 @@ export { default as Stacked } from './Charts/Stacked';
 export { default as Pie } from './Charts/Pie';
 export { default as ChartsHeader } from './ChartsHeader';
 export { default as Header } from './Header';
+export { default as LineChart5 } from './Charts/LineChart5';
+export { default as LineChart3 } from './Charts/LineChart3';
+export { default as LineChart4 } from './Charts/LineChart4';
 

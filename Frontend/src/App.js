@@ -4,7 +4,12 @@ import { FiSettings } from 'react-icons/fi';
 import { TooltipComponent } from '@syncfusion/ej2-react-popups';
 
 import { Navbar, Footer, Sidebar, ThemeSettings } from './components';
-import { Ecommerce, Home, Line, Area, Bar, Pie, Financial } from './pages';
+// import { Ecommerce, Home, Line, Area, Bar, Pie, Financial } from './pages';
+import { Ecommerce, Home, Line, Area, Line4, Line5, Line3 } from './pages';
+// Example of correct import assuming Login is a component in './pages'
+import Login from './pages/Login';
+
+
 import './App.css';
 
 import { useStateContext } from './contexts/ContextProvider';
@@ -71,9 +76,11 @@ const App = () => {
                 {/* charts  */}
                 <Route path="/Crime Trend Analysis" element={<Line />} />
                 <Route path="/Crime Severity Assessment" element={<Area />} />
-                <Route path="/Modus Operandi (MO) Analysis" element={<Bar />} />
-                <Route path="/Age Distribution of Victims" element={<Pie />} />
-                <Route path="/Seasonal Crime Patterns" element={<Financial />} />
+                <Route path="/Modus Operandi Analysis" element={<Line3 />} />
+                <Route path="/Age Distribution of Victims" element={<Line4 />} />
+                <Route path="/Seasonal Crime Patterns" element={<Line5 />} />
+                <Route path="/Login" element={<Login />} />
+                
                 
 
               </Routes>

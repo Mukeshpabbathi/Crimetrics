@@ -9,18 +9,19 @@ import {
   Legend,
   Tooltip,
 } from '@syncfusion/ej2-react-charts';
-import { LinePrimaryXAxis, LinePrimaryYAxis, chatData } from '../../data/dummy';
+import { LinePrimaryXAxis, LinePrimaryYAxis } from '../../data/dummy';
 import { useStateContext } from '../../contexts/ContextProvider';
 
-const LineChart = ({ data, selectedAreas }) => {
+const LineChart5 = ({ data, selectedCrimes,selectedSeason }) => {
   const { currentMode } = useStateContext();
 
   // Filter data based on selected areas
-  const filteredData = selectedAreas.length === 0 ? data : data.filter(item => selectedAreas.includes(item[1]));
+  const filteredDataInitial = selectedCrimes.length === 0 ? data : data.filter(item => selectedCrimes.includes(item[2]));
+  const filteredData = selectedSeason.length === 0 ? filteredDataInitial : filteredDataInitial.filter(item => selectedSeason.includes(item[1]));
 
   // Group data by AreaName
   const groupedData = filteredData.reduce((acc, item) => {
-    const key = item[1];
+    const key = [item[2],item[1]];
 
     if (!acc[key]) {
       acc[key] = [];
@@ -29,26 +30,31 @@ const LineChart = ({ data, selectedAreas }) => {
     return acc;
   }, {});
 
+  console.log(groupedData)
+
   // Generate lineChartData and lineCustomSeries
-  const lineChartData = [];
+  let lineChartData = [];
   const lineCustomSeries = [];
 
-  Object.keys(groupedData).forEach((areaName, index) => {
-    let chartData = groupedData[areaName].map((item) => ({
-      x: new Date(item[2], 0, 1),
+  Object.keys(groupedData).forEach((key, index) => {
+    let chartData = groupedData[key].map((item) => ({  
+      x: new Date(item[0], 0, 1),
       y: item[3],
     }));
-if (selectedAreas.length ==0) {
-chartData =[]
+console.log(chartData)
+console.log("Crimes = " + selectedCrimes)
+console.log("Season =" +selectedSeason)
+if (selectedCrimes.length == 0 && selectedSeason.length == 0){
+    chartData = [];
 }
-else{
+else {
     lineChartData.push(chartData);
 }
     const series = {
       dataSource: chartData,
       xName: 'x',
       yName: 'y',
-      name: areaName,
+      name: key,
       width: '2',
       marker: { visible: true, width: 10, height: 10 },
       type: 'Line',
@@ -80,4 +86,4 @@ else{
   );
 };
 
-export default LineChart;
+export default LineChart5;

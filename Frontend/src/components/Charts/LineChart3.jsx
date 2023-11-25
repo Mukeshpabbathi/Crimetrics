@@ -9,18 +9,18 @@ import {
   Legend,
   Tooltip,
 } from '@syncfusion/ej2-react-charts';
-import { LinePrimaryXAxis, LinePrimaryYAxis, chatData } from '../../data/dummy';
+import { LinePrimaryXAxis, LinePrimaryYAxis } from '../../data/dummy';
 import { useStateContext } from '../../contexts/ContextProvider';
 
-const LineChart = ({ data, selectedAreas }) => {
+const LineChart3 = ({ data, selectedMocodes }) => {
   const { currentMode } = useStateContext();
 
-  // Filter data based on selected areas
-  const filteredData = selectedAreas.length === 0 ? data : data.filter(item => selectedAreas.includes(item[1]));
+  // Filter data based on selected Mocodes
+  const filteredData = selectedMocodes.length === 0 ? data : data.filter(item => selectedMocodes.includes(item[0]));
 
   // Group data by AreaName
   const groupedData = filteredData.reduce((acc, item) => {
-    const key = item[1];
+    const key = item[0];
 
     if (!acc[key]) {
       acc[key] = [];
@@ -29,26 +29,30 @@ const LineChart = ({ data, selectedAreas }) => {
     return acc;
   }, {});
 
+  console.log(groupedData)
+
   // Generate lineChartData and lineCustomSeries
-  const lineChartData = [];
+  let lineChartData = [];
   const lineCustomSeries = [];
 
-  Object.keys(groupedData).forEach((areaName, index) => {
-    let chartData = groupedData[areaName].map((item) => ({
-      x: new Date(item[2], 0, 1),
-      y: item[3],
+  Object.keys(groupedData).forEach((mocode, index) => {
+    let chartData = groupedData[mocode].map((item) => ({  
+      x: new Date(item[1], 0, 1),
+      y: item[2],
     }));
-if (selectedAreas.length ==0) {
-chartData =[]
+console.log(chartData)
+
+if (selectedMocodes.length == 0){
+    chartData = [];
 }
-else{
+else {
     lineChartData.push(chartData);
 }
     const series = {
       dataSource: chartData,
       xName: 'x',
       yName: 'y',
-      name: areaName,
+      name: mocode,
       width: '2',
       marker: { visible: true, width: 10, height: 10 },
       type: 'Line',
@@ -80,4 +84,4 @@ else{
   );
 };
 
-export default LineChart;
+export default LineChart3;

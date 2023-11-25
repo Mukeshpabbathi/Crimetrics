@@ -1,35 +1,87 @@
-import React from 'react';
-import { ChartComponent, SeriesCollectionDirective, SeriesDirective, Inject, Legend, Category, Tooltip, ColumnSeries, DataLabel } from '@syncfusion/ej2-react-charts';
-
-import { barCustomSeries, barPrimaryXAxis, barPrimaryYAxis } from '../../data/dummy';
+import React, { useState, useEffect } from 'react';
+import { Bar } from 'react-chartjs-2';  // Import Bar from react-chartjs-2
 import { ChartsHeader } from '../../components';
 import { useStateContext } from '../../contexts/ContextProvider';
 
-const Bar = () => {
+const BarChart = () => {
   const { currentMode } = useStateContext();
+  const [chartData, setChartData] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/api/seasonal-crime-patterns');
+        const data = await response.json();
+        console.log(data);
+
+        // Format your data to match Chart.js expectations
+        const formattedData = formatDataForChart(data);
+        console.log(formattedData);
+        setChartData(formattedData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []); // Empty dependency array to trigger the effect only once
+
+  const formatDataForChart = (data) => {
+    const labels = [...new Set(data.map((entry) => entry[1]))];
+    const datasets = [];
+
+    // Iterate through the crime types in your data
+    data.forEach((entry) => {
+      const dataset = {
+        label: entry[2],
+        data: data
+          .filter((item) => item[2] === entry[2])
+          .map((item) => item[3]),
+        backgroundColor: 'green', // Replace with your color logic
+      };
+
+      datasets.push(dataset);
+    });
+
+    return {
+      labels,
+      datasets,
+    };
+  };
 
   return (
     <div className="m-4 md:m-10 mt-24 p-10 bg-white dark:bg-secondary-dark-bg rounded-3xl">
-      <ChartsHeader category="Bar" title="Olympic Medal Counts - RIO" />
-      <div className=" w-full">
-        <ChartComponent
-          id="charts"
-          primaryXAxis={barPrimaryXAxis}
-          primaryYAxis={barPrimaryYAxis}
-          chartArea={{ border: { width: 0 } }}
-          tooltip={{ enable: true }}
-          background={currentMode === 'Dark' ? '#33373E' : '#fff'}
-          legendSettings={{ background: 'white' }}
-        >
-          <Inject services={[ColumnSeries, Legend, Tooltip, Category, DataLabel]} />
-          <SeriesCollectionDirective>
-            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-            {barCustomSeries.map((item, index) => <SeriesDirective key={index} {...item} />)}
-          </SeriesCollectionDirective>
-        </ChartComponent>
+      <ChartsHeader category="Bar" title="Seasonal Crime Patterns and Types of Crimes" />
+      <div className="w-full">
+        {chartData && (
+          <Bar
+            data={chartData}
+            options={{
+              scales: {
+                x: {
+                  type: 'category',
+                  stacked: true,
+                },
+                y: {
+                  type: 'linear',
+                  stacked: true,
+                },
+              },
+              plugins: {
+                legend: {
+                  display: true,
+                  position: 'bottom',
+                  labels: {
+                    color: currentMode === 'Dark' ? '#fff' : '#333',
+                  },
+                },
+              },
+            }}
+          />
+        )}
       </div>
     </div>
   );
 };
 
-export default Bar;
+export default BarChart;
