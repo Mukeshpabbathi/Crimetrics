@@ -9,18 +9,18 @@ import {
   Legend,
   Tooltip,
 } from '@syncfusion/ej2-react-charts';
-import { LinePrimaryXAxis, LinePrimaryYAxis } from '../../data/dummy';
+import { LinePrimaryXAxis, LinePrimaryYAxis } from '../../data/dummy'; // Import your dummy data and axes configurations
 import { useStateContext } from '../../contexts/ContextProvider';
 
-const LineChart3 = ({ data, selectedMocodes }) => {
+const LineChart2 = ({ data, selectedCrimeCodes }) => {
   const { currentMode } = useStateContext();
 
-  // Filter data based on selected Mocodes
-  const filteredData = selectedMocodes.length === 0 ? data : data.filter(item => selectedMocodes.includes(item[0]));
+  // Filter data based on selected crime codes
+  const filteredData = data.filter(item => selectedCrimeCodes.includes(item.crimeCode));
 
-  // Group data by AreaName
+  // Group data by policeAreaCode and crimeYear
   const groupedData = filteredData.reduce((acc, item) => {
-    const key = item[0];
+    const key = [item.policeAreaCode, item.crimeYear];
 
     if (!acc[key]) {
       acc[key] = [];
@@ -29,30 +29,29 @@ const LineChart3 = ({ data, selectedMocodes }) => {
     return acc;
   }, {});
 
-  console.log(groupedData)
-
   // Generate lineChartData and lineCustomSeries
-  let lineChartData = [];
+  const lineChartData = [];
   const lineCustomSeries = [];
 
-  Object.keys(groupedData).forEach((mocode, index) => {
-    let chartData = groupedData[mocode].map((item) => ({  
-      x: new Date(item[1], 0, 1),
-      y: item[2],
+  Object.keys(groupedData).forEach((key, index) => {
+    const [policeAreaCode, crimeYear] = key;
+    
+    let chartData = groupedData[key].map((item) => ({
+      x: new Date(crimeYear, 0, 1),
+      y: item.crimesCount,
     }));
-console.log(chartData)
 
-if (selectedMocodes.length === 0){
-    chartData = [];
-}
-else {
-    lineChartData.push(chartData);
-}
+    if (selectedCrimeCodes.length === 0) {
+      chartData = [];
+    } else {
+      lineChartData.push(chartData);
+    }
+
     const series = {
       dataSource: chartData,
       xName: 'x',
       yName: 'y',
-      name: mocode,
+      name: `Area ${policeAreaCode}`,
       width: '2',
       marker: { visible: true, width: 10, height: 10 },
       type: 'Line',
@@ -72,7 +71,7 @@ else {
       chartArea={{ border: { width: 0 } }}
       tooltip={{ enable: true }}
       background={currentMode === 'Dark' ? '#33373E' : '#fff'}
-      legendSettings={{ background: 'white', visible: selectedMocodes.length > 0 }}
+      legendSettings={{ background: 'white' }}
     >
       <Inject services={[LineSeries, DateTime, Legend, Tooltip]} />
       <SeriesCollectionDirective>
@@ -84,4 +83,4 @@ else {
   );
 };
 
-export default LineChart3;
+export default LineChart2;

@@ -38,7 +38,7 @@ const LineChart = ({ data, selectedAreas }) => {
       x: new Date(item[2], 0, 1),
       y: item[3],
     }));
-if (selectedAreas.length ==0) {
+if (selectedAreas.length ===0) {
 chartData =[]
 }
 else{
@@ -68,7 +68,7 @@ else{
       chartArea={{ border: { width: 0 } }}
       tooltip={{ enable: true }}
       background={currentMode === 'Dark' ? '#33373E' : '#fff'}
-      legendSettings={{ background: 'white' }}
+      legendSettings={{ background: 'white', visible: selectedAreas.length > 0 }}
     >
       <Inject services={[LineSeries, DateTime, Legend, Tooltip]} />
       <SeriesCollectionDirective>

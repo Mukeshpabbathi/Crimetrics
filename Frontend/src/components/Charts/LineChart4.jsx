@@ -15,9 +15,12 @@ import { useStateContext } from '../../contexts/ContextProvider';
 const LineChart4 = ({ data, selectedCrimes,selectedAgeGroup }) => {
   const { currentMode } = useStateContext();
 
+  selectedCrimes = selectedCrimes || [];
+  selectedAgeGroup = selectedAgeGroup || [];
+
   // Filter data based on selected crimes and age groups
-  const filteredDataInitial = selectedCrimes.length === 0 ? data : data.filter(item => selectedCrimes.includes(item[0]));
-  const filteredData = selectedAgeGroup.length === 0 ? filteredDataInitial : filteredDataInitial.filter(item => selectedAgeGroup.includes(item[2]));
+  const filteredDataInitial = (!selectedCrimes || selectedCrimes.length === 0) ? data : data.filter(item => selectedCrimes.includes(item[0]));
+  const filteredData = (!selectedAgeGroup || selectedAgeGroup.length === 0) ? filteredDataInitial : filteredDataInitial.filter(item => selectedAgeGroup.includes(item[2]));
 
   // Group data by AreaName
   const groupedData = filteredData.reduce((acc, item) => {
@@ -42,7 +45,7 @@ const LineChart4 = ({ data, selectedCrimes,selectedAgeGroup }) => {
       y: item[3],
     }));
 
-if (selectedCrimes.length == 0 && selectedAgeGroup.length == 0){
+if (selectedCrimes.length === 0 && selectedAgeGroup.length === 0){
     chartData = [];
 }
 else {
@@ -72,7 +75,7 @@ else {
       chartArea={{ border: { width: 0 } }}
       tooltip={{ enable: true }}
       background={currentMode === 'Dark' ? '#33373E' : '#fff'}
-      legendSettings={{ background: 'white' }}
+      legendSettings={{ background: 'white', visible: selectedCrimes.length > 0 }}
     >
       <Inject services={[LineSeries, DateTime, Legend, Tooltip]} />
       <SeriesCollectionDirective>

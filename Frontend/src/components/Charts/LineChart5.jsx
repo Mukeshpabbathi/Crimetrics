@@ -15,6 +15,8 @@ import { useStateContext } from '../../contexts/ContextProvider';
 const LineChart5 = ({ data, selectedCrimes,selectedSeason }) => {
   const { currentMode } = useStateContext();
 
+
+
   // Filter data based on selected areas
   const filteredDataInitial = selectedCrimes.length === 0 ? data : data.filter(item => selectedCrimes.includes(item[2]));
   const filteredData = selectedSeason.length === 0 ? filteredDataInitial : filteredDataInitial.filter(item => selectedSeason.includes(item[1]));
@@ -44,7 +46,7 @@ const LineChart5 = ({ data, selectedCrimes,selectedSeason }) => {
 console.log(chartData)
 console.log("Crimes = " + selectedCrimes)
 console.log("Season =" +selectedSeason)
-if (selectedCrimes.length == 0 && selectedSeason.length == 0){
+if (selectedCrimes.length === 0 && selectedSeason.length === 0){
     chartData = [];
 }
 else {
@@ -74,7 +76,7 @@ else {
       chartArea={{ border: { width: 0 } }}
       tooltip={{ enable: true }}
       background={currentMode === 'Dark' ? '#33373E' : '#fff'}
-      legendSettings={{ background: 'white' }}
+      legendSettings={{ background: 'white', visible: selectedCrimes.length > 0 }}
     >
       <Inject services={[LineSeries, DateTime, Legend, Tooltip]} />
       <SeriesCollectionDirective>
