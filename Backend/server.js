@@ -38,10 +38,9 @@ app.get('/api/data', async (req, res) => {
   }
 });
 app.get('/api/crime-trend-analysis', async (req, res) => {
+  const connection = await oracledb.getConnection(dbConfig);
   try {
     // Establish the Oracle database connection
-    const connection = await oracledb.getConnection(dbConfig);
-
     // Your SQL query
     const query = `
       SELECT
@@ -49,12 +48,16 @@ app.get('/api/crime-trend-analysis', async (req, res) => {
         PJ.location AS areaName,
         EXTRACT(YEAR FROM CID.dateOccurred) AS crimeYear,
         COUNT(*) AS crimeCount
-      FROM crimeIncidentDetails CID
+      FROM 
+        crimeIncidentDetails CID
       JOIN CRIMEJURISDICTION CJ ON CID.crimeID = CJ.crimeID
       JOIN policeJurisdiction PJ ON CJ.policeAreaCode = PJ.areaCode
-      WHERE EXTRACT(YEAR FROM CID.dateOccurred) >= EXTRACT(YEAR FROM SYSDATE) - 5
-      GROUP BY PJ.areaCode, PJ.location, EXTRACT(YEAR FROM CID.dateOccurred)
-      ORDER BY PJ.areaCode, crimeYear
+      WHERE 
+        EXTRACT(YEAR FROM CID.dateOccurred) >= EXTRACT(YEAR FROM SYSDATE) - 5
+      GROUP BY 
+        PJ.areaCode, PJ.location, EXTRACT(YEAR FROM CID.dateOccurred)
+      ORDER BY 
+        PJ.areaCode, crimeYear
     `;
 
     // Execute the query
@@ -65,14 +68,22 @@ app.get('/api/crime-trend-analysis', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }finally {
+    // Close the database connection in the finally block to ensure it is closed regardless of success or failure
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
   }
 });
 
 app.get('/api/seasonal-crime-patterns', async (req, res) => {
+  const connection = await oracledb.getConnection(dbConfig);
   try {
     // Establish the Oracle database connection
-    const connection = await oracledb.getConnection(dbConfig);
-
     // Your SQL query
     const query = `
     SELECT
@@ -110,65 +121,24 @@ app.get('/api/seasonal-crime-patterns', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-app.get('/api/crimecategory', async (req, res) => {
-  try {
-    // Establish the Oracle database connection
-    const connection = await oracledb.getConnection(dbConfig);
-
-    // Your SQL query
-    const query = `
-    SELECT      
-                A.*,
-                C.description
-FROM        
-                ( SELECT            COUNT(DISTINCT CJ.crimeId) AS CRIMESCOUNT,
-                                CC.crimeCode,
-                                CJ.policeAreaCode,
-                                EXTRACT(YEAR FROM CD.dateOccurred) AS CRIMEYEAR,
-                                ROW_NUMBER() OVER (PARTITION BY     CJ.policeAreaCode, 
-                                                                    EXTRACT(YEAR FROM CD.dateOccurred)
-                                                    ORDER BY        COUNT(CJ.crimeId) DESC) AS YEARRANK
-                FROM            CRIMECOMMITTED CC
-                JOIN            CRIMEJURISDICTION CJ
-                ON              cj.crimeId = cc.crimeId
-                JOIN            CrimeIncidentDetails CD
-                ON              CD.crimeId = cc.crimeId
-                GROUP BY        
-                                cj.policeAreaCode,
-                                CC.crimeCode, 
-                                EXTRACT(YEAR FROM CD.dateOccurred)
-                ORDER BY        
-                                CJ.policeAreaCode,
-                                CRIMEYEAR
-                ) A
-JOIN            CRIME C
-ON              C.crimeCode = A.crimeCode
-WHERE           YEARRANK <=3
-ORDER BY        
-                policeAreaCode,
-                crimeYear,
-                crimesCount DESC
-    `;
-
-    // Execute the query
-    const result = await connection.execute(query);
-
-    // Send the result as JSON response
-    res.json(result.rows);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+  }finally {
+    // Close the database connection in the finally block to ensure it is closed regardless of success or failure
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
   }
 });
 
 app.post('/api/login', async (req, res) => {
+  const connection = await oracledb.getConnection(dbConfig);
   const { email, password } = req.body;
   try {
     // Establish the Oracle database connection
-    const connection = await oracledb.getConnection(dbConfig);
+
 
     // Check if the user exists
     const checkUserQuery = 'SELECT * FROM userdetails WHERE EMAIL = :email';
@@ -203,39 +173,77 @@ app.post('/api/login', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }finally {
+    // Close the database connection in the finally block to ensure it is closed regardless of success or failure
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
   }
 });
 app.get('/api/getNumTuples', async (req, res) => {
+  const connection = await oracledb.getConnection(dbConfig);
   try {
     // Establish the Oracle database connection
-    const connection = await oracledb.getConnection(dbConfig);
 
-    // List of specific tables you want to count rows for
-    const targetTables = ['CRIME', 'CRIMECOMMITTED', 'CRIMEINCIDENTDETAILS', 'CRIMEJURISDICTION', 'CRIMEMODUSOPERANDI', 'MODUSOPERANDI', 'PARTIESINVOLVED', 'POLICEJURISDICTION', 'PREMISES', 'SUSPECT', 'VICTIM', 'WEAPON','WEAPONUSEDINCRIME'];
+    const totalCountQuery = `
+    SELECT 
+        SUM(tableRecords) as totalRecords 
+    FROM
+    (
+    SELECT  
+        TABLE_NAME, NUM_ROWS as tablerecords
+    FROM 
+        ALL_TAB_STATISTICS
+    WHERE 
+        OWNER = 'MUKESHPABBATHI'
+    )
+    `;
+    const totalCountResult = await connection.execute(totalCountQuery);
+    console.log(totalCountResult.rows[0][0]);
 
-    // Initialize an object to store table names and row counts
-    const tableRowCounts = {};
+    // // List of specific tables you want to count rows for
+    // const targetTables = ['CRIME', 'CRIMECOMMITTED', 'CRIMEINCIDENTDETAILS', 'CRIMEJURISDICTION', 'CRIMEMODUSOPERANDI', 'MODUSOPERANDI', 'PARTIESINVOLVED', 'POLICEJURISDICTION', 'PREMISES', 'SUSPECT', 'VICTIM', 'WEAPON','WEAPONUSEDINCRIME'];
 
-    // Iterate through specified tables and get row counts
-    for (const tableName of targetTables) {
-      const countQuery = `SELECT COUNT(*) AS numRows FROM ${tableName}`;
-      const countResult = await connection.execute(countQuery);
+    // // Initialize an object to store table names and row counts
+    // const tableRowCounts = {};
+
+    // // Iterate through specified tables and get row counts
+    // for (const tableName of targetTables) {
+    //   const countQuery = `SELECT COUNT(*) AS numRows FROM ${tableName}`;
+    //   const countResult = await connection.execute(countQuery);
       
-      // Store the table name and row count in the object
-      tableRowCounts[tableName] = countResult.rows[0][0];
-    }
-    console.log(tableRowCounts);
+    //   // Store the table name and row count in the object
+    //   tableRowCounts[tableName] = countResult.rows[0][0];
+    // }
+    // console.log(tableRowCounts);
+
     // Send the result as JSON response
-    res.json(tableRowCounts);
+    res.json(totalCountResult.rows[0]);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }finally {
+    // Close the database connection in the finally block to ensure it is closed regardless of success or failure
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
   }
 });
+
+
 app.get('/api/Modus-Operandi-Analysis', async (req, res) => {
+  const connection = await oracledb.getConnection(dbConfig);
   try {
     // Establish the Oracle database connection
-    const connection = await oracledb.getConnection(dbConfig);
+
     // Your SQL query
     const query = `   
       SELECT 
@@ -260,7 +268,7 @@ app.get('/api/Modus-Operandi-Analysis', async (req, res) => {
           MO.mocode 
       ORDER BY 
           COUNT(MO.description) DESC 
-      FETCH FIRST 10 ROWS ONLY
+      FETCH FIRST 30 ROWS ONLY
       )
       GROUP BY 
           EXTRACT(YEAR FROM CID.dateOccurred),
@@ -275,50 +283,60 @@ app.get('/api/Modus-Operandi-Analysis', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }finally {
+    // Close the database connection in the finally block to ensure it is closed regardless of success or failure
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
   }
 });
 
 
 app.get('/api/Age-Distribution-of-Victims', async (req, res) => {
+  const connection = await oracledb.getConnection(dbConfig);
   try {
     // Establish the Oracle database connection
-    const connection = await oracledb.getConnection(dbConfig);
+
     // Your SQL query
     const query = `   
-            SELECT
-                C.description AS crimeType,
-                EXTRACT(YEAR FROM CID.dateOccurred) AS year,
-            CASE
-                WHEN V.age BETWEEN 1 AND 12 THEN 'Kids'
-                WHEN V.age BETWEEN 13 AND 19 THEN 'Teen'
-                WHEN V.age BETWEEN 20 AND 40 THEN 'Youth'
-                WHEN V.age BETWEEN 41 AND 60 THEN 'Middle'
-                WHEN V.age > 60 THEN 'Old'
-                ELSE 'Unknown Age group'
-            END as ageGroup,
-                COUNT(*) as crimeCount
-            FROM
-                CRIMEINCIDENTDETAILS CID 
-            JOIN
-                PARTIESINVOLVED P ON CID.crimeID = P.crimeID
-            JOIN
-                VICTIM V ON P.victimID = V.victimID
-            JOIN
-                crimecommitted CC ON CID.crimeID = CC.crimeID 
-            JOIN
-                crime C ON CC.crimeCode = C.crimeCode
-            GROUP BY
-                C.description, EXTRACT(YEAR FROM CID.dateOccurred),
-                CASE
-                    WHEN V.age BETWEEN 1 AND 12 THEN 'Kids'
-                    WHEN V.age BETWEEN 13 AND 19 THEN 'Teen'
-                    WHEN V.age BETWEEN 20 AND 40 THEN 'Youth'
-                    WHEN V.age BETWEEN 41 AND 60 THEN 'Middle'
-                    WHEN V.age > 60 THEN 'Old'
-                    ELSE 'Unknown Age group'
-                END
-            ORDER BY
-                C.description, EXTRACT(YEAR FROM CID.dateOccurred)
+    SELECT
+        C.description AS crimetype,
+        EXTRACT(YEAR FROM CID.dateOccurred) AS year,
+        CASE
+            WHEN V.age BETWEEN 1 AND 12 THEN 'Kids(1_12)'
+            WHEN V.age BETWEEN 13 AND 19 THEN 'Teenage(13_19)'
+            WHEN V.age BETWEEN 20 AND 40 THEN 'Youth(20_40)'
+            WHEN V.age BETWEEN 41 AND 60 THEN 'Middle Age(41_60)'
+            WHEN V.age > 60 THEN 'Elderly(>60)'
+            ELSE 'Unknown Age group'
+        END as ageGroup,
+        COUNT(*) as crimeCount
+    FROM
+        CRIMEINCIDENTDETAILS CID 
+    JOIN
+        PARTIESINVOLVED P ON CID.crimeID = P.crimeID
+    JOIN
+        VICTIM V ON P.victimID = V.victimID
+    JOIN
+        crimecommitted CC ON CID.crimeID = CC.crimeID 
+    JOIN
+        crime C ON CC.crimeCode = C.crimeCode
+    GROUP BY
+        C.description, EXTRACT(YEAR FROM CID.dateOccurred),
+        CASE
+            WHEN V.age BETWEEN 1 AND 12 THEN 'Kids(1_12)'
+            WHEN V.age BETWEEN 13 AND 19 THEN 'Teenage(13_19)'
+            WHEN V.age BETWEEN 20 AND 40 THEN 'Youth(20_40)'
+            WHEN V.age BETWEEN 41 AND 60 THEN 'Middle Age(41_60)'
+            WHEN V.age > 60 THEN 'Elderly(>60)'
+            ELSE 'Unknown Age group'
+        END
+    ORDER BY
+        C.description, EXTRACT(YEAR FROM CID.dateOccurred)
     `;
     // Execute the query
     const result = await connection.execute(query);
@@ -327,9 +345,151 @@ app.get('/api/Age-Distribution-of-Victims', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }finally {
+    // Close the database connection in the finally block to ensure it is closed regardless of success or failure
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
   }
 });
 
+app.get('/api/Crime-Severity-Assessment', async (req, res) => {
+  const connection = await oracledb.getConnection(dbConfig);
+
+  try {
+    // Establish the Oracle database connection
+    // Your SQL query
+    const query = `   
+    SELECT 
+        CODEWISEDATA.*,
+        PJ.division,
+        C.description
+    FROM 
+    (SELECT          
+        crimeCode,
+        policeAreaCode 
+    FROM     
+    ( 
+    SELECT          
+        COUNT(DISTINCT CC.crimeId) AS crimeCount, 
+        CC.crimeCode, 
+        CJ.policeAreaCode,
+        ROW_NUMBER() OVER (PARTITION BY CJ.policeAreaCode
+        ORDER BY COUNT(CC.crimeId) DESC) AS crimeRank
+    FROM            
+        CRIMECOMMITTED CC
+    JOIN            
+        CRIMEJURISDICTION CJ ON CC.crimeId = CJ.crimeId
+    GROUP BY        
+        CC.crimeCode, CJ.policeAreaCode 
+    )
+    WHERE  
+        crimeRank <= 5
+    ORDER BY        
+        policeAreaCode,crimeCount DESC 
+    ) TOPCRIMECODES
+    JOIN    
+    (SELECT          
+        CC.crimeCode,
+        EXTRACT(YEAR FROM C.dateOccurred) AS YEAR,
+        CJ.policeAreaCode,
+        COUNT(DISTINCT CC.crimeId) AS crimeCount
+    FROM            
+        CRIMECOMMITTED CC
+    JOIN            
+        CRIMEJURISDICTION CJ ON CC.crimeId = CJ.crimeId
+    JOIN            
+        CRIMEINCIDENTDETAILS C ON CC.crimeId = C.crimeId
+    GROUP BY        
+        CC.crimeCode, CJ.policeAreaCode,EXTRACT(YEAR FROM C.dateOccurred)
+    ORDER BY        
+        CJ.policeAreaCode,EXTRACT(YEAR FROM C.dateOccurred),crimeCount DESC 
+    ) CODEWISEDATA ON TOPCRIMECODES.crimeCode = CODEWISEDATA.crimeCode
+    AND TOPCRIMECODES.policeAreaCode = CODEWISEDATA.policeAreaCode
+    JOIN 
+        CRIME C ON TOPCRIMECODES.crimeCode = C.crimeCode
+    JOIN
+        POLICEJURISDICTION PJ ON PJ.areacode = CODEWISEDATA.policeAreaCode
+    ORDER BY  
+        CODEWISEDATA.policeAreaCode, CODEWISEDATA.crimeCode,
+        CODEWISEDATA.year, CODEWISEDATA.crimeCount DESC
+    `;
+    // Execute the query
+    const result = await connection.execute(query);
+    // Send the result as JSON response
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }finally {
+    // Close the database connection in the finally block to ensure it is closed regardless of success or failure
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+});
+
+app.get('/api/Law-Enforcement-Performance-Ratio', async (req, res) => {
+  const connection = await oracledb.getConnection(dbConfig);
+
+  try {
+    // Establish the Oracle database connection
+    // Your SQL query
+    const query = `   
+    SELECT 
+        SUM(A.UNSOLVED) AS UNSOLVED, 
+        SUM(A.SOLVED) AS SOLVED, 
+        A.policeareacode, 
+        PJ.division, 
+        A.YEAR, 
+        ROUND(SUM(A.SOLVED)/SUM(A.UNSOLVED)*100,2) AS PERFORMANCE
+    FROM
+    (
+    SELECT 
+      COUNT(DISTINCT CASE WHEN CID.STATUS NOT LIKE '%Invest Cont%' THEN CID.Crimeid END) AS SOLVED,
+      COUNT(DISTINCT CASE WHEN CID.STATUS LIKE '%Invest Cont%' THEN CID.Crimeid END) AS UNSOLVED,
+      CJ.policeareacode,
+      EXTRACT(YEAR FROM CID.DATEOCCURRED) AS YEAR
+    FROM 
+      crimeincidentdetails CID
+    JOIN 
+      CRIMEJURISDICTION CJ ON CJ.crimeid = CID.crimeid
+    GROUP BY 
+      CID.status, CJ.policeareacode,EXTRACT(YEAR FROM CID.DATEOCCURRED)
+    ) A
+    JOIN 
+        policeJurisdiction  PJ ON A.policeareacode = PJ.AREACODE
+    GROUP BY 
+        A.policeareacode, PJ.division, A.YEAR
+    ORDER BY 
+        A.policeareacode, A.YEAR
+    `;
+    // Execute the query
+    const result = await connection.execute(query);
+    // Send the result as JSON response
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }finally {
+    // Close the database connection in the finally block to ensure it is closed regardless of success or failure
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

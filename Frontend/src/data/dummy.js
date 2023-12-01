@@ -1,5 +1,5 @@
 import React from 'react';
-import { AiOutlineCalendar, AiOutlineShoppingCart,AiTwotoneDatabase, AiOutlineUser, AiOutlineAreaChart, AiOutlineBarChart, AiOutlineStock } from 'react-icons/ai';
+import { AiOutlineCalendar, AiOutlineShoppingCart,AiTwotoneDatabase,AiOutlineHome,AiTwotoneSecurityScan, AiOutlineUser, AiOutlineAreaChart,AiOutlineHeatMap, AiOutlineBarChart,AiOutlineBell, AiOutlineStock } from 'react-icons/ai';
 import { FiShoppingBag, FiEdit, FiPieChart, FiBarChart, FiCreditCard, FiStar, FiShoppingCart } from 'react-icons/fi';
 import { BsKanban, BsBarChart, BsBoxSeam, BsCurrencyDollar, BsShield, BsChatLeft } from 'react-icons/bs';
 import { BiColorFill } from 'react-icons/bi';
@@ -32,6 +32,7 @@ export const gridOrderImage = (props) => (
     />
   </div>
 );
+
 
 export const gridOrderStatus = (props) => (
   <button
@@ -372,6 +373,7 @@ export const FinancialPrimaryYAxis = {
 };
 
 export const LinePrimaryXAxis = {
+  title: 'Year',
   valueType: 'DateTime',
   labelFormat: 'y',
   intervalType: 'Years',
@@ -475,7 +477,7 @@ export const links = [
     links: [
       {
         name: 'Home',
-        icon: <BsKanban />,
+        icon: <AiOutlineHome />,
       },
     ],
   },
@@ -484,24 +486,28 @@ export const links = [
     title: 'Trend Queries',
     links: [
       {
-        name: 'Crime Trend Analysis',
-        icon: <AiOutlineShoppingCart />,
-      },
-      {
-        name: 'Crime Category',
-        icon: <AiOutlineShoppingCart />,
+        name: 'Seasonal Crime Patterns',
+        icon: <AiOutlineCalendar />,
       },
       {
         name: 'Modus Operandi Analysis',
-        icon: <AiOutlineShoppingCart />,
+        icon: <AiTwotoneSecurityScan />,
       },
       {
         name: 'Age Distribution of Victims',
         icon: <IoMdContacts />,
       },
       {
-        name: 'Seasonal Crime Patterns',
-        icon: <RiContactsLine />,
+        name: 'Crime Severity Assessment',
+        icon: <AiOutlineBell />,
+      },
+      {
+        name: 'Law Enforcement Performance Ratio',
+        icon: <AiOutlineStock />,
+      },
+      {
+        name: 'Crime Trend Analysis',
+        icon: <AiOutlineHeatMap />,
       }
     ],
   },

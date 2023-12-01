@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { MdOutlineSupervisorAccount } from 'react-icons/md';
+import { AiOutlineCalendar, AiOutlineShoppingCart,AiTwotoneDatabase,AiOutlineHome,AiTwotoneSecurityScan, AiOutlineUser, AiOutlineAreaChart,AiOutlineHeatMap, AiOutlineBarChart,AiOutlineBell, AiOutlineStock } from 'react-icons/ai';
 import { FiBarChart } from 'react-icons/fi';
+import { IoMdContacts } from 'react-icons/io';
+
 import { useStateContext } from '../contexts/ContextProvider';
 import './Home.css';
-
-
 
 
 const Home = () => {
@@ -63,6 +64,7 @@ const Home = () => {
     }
   };
 
+  
 
   return (
     <div className="mt-24">
@@ -80,9 +82,9 @@ const Home = () => {
                 style={{ color: '#03C9D7', backgroundColor: '#E5FAFB' }}
                 className="text-2xl opacity-0.9 rounded-full  p-4 hover:drop-shadow-xl"
               >
-                <MdOutlineSupervisorAccount />
+                <AiOutlineCalendar />
               </button>
-              <p className="text-lg font-semibold mb-2">Crime Trend Analysis</p>
+              <p className="text-lg font-semibold mb-2">Seasonal Crime Patterns</p>
           </div>
 
           <div className="bg-white dark:text-gray-200 dark:bg-secondary-dark-bg md:w-56 h-44 p-4 pt-9 rounded-2xl shadow-md">
@@ -92,19 +94,7 @@ const Home = () => {
                 style={{ color: '#03C9D7', backgroundColor: '#E5FAFB' }}
                 className="text-2xl opacity-0.9 rounded-full  p-4 hover:drop-shadow-xl"
               >
-                <MdOutlineSupervisorAccount />
-              </button>
-            <p className="text-lg font-semibold mb-2">Crime Category</p>
-            
-          </div>
-
-          <div className="bg-white dark:text-gray-200 dark:bg-secondary-dark-bg md:w-56 h-44 p-4 pt-9 rounded-2xl shadow-md">
-          <button
-                type="button"
-                style={{ color: '#03C9D7', backgroundColor: '#E5FAFB' }}
-                className="text-2xl opacity-0.9 rounded-full  p-4 hover:drop-shadow-xl"
-              >
-                <MdOutlineSupervisorAccount />
+                <AiTwotoneSecurityScan />
               </button>
             <p className="text-lg font-semibold mb-2">Modus Operandi Analysis</p>
             
@@ -116,9 +106,35 @@ const Home = () => {
                 style={{ color: '#03C9D7', backgroundColor: '#E5FAFB' }}
                 className="text-2xl opacity-0.9 rounded-full  p-4 hover:drop-shadow-xl"
               >
-                <MdOutlineSupervisorAccount />
+                <IoMdContacts />
               </button>
             <p className="text-lg font-semibold mb-2">Age Distribution of Victims</p>
+            
+          </div>
+
+
+          <div className="bg-white dark:text-gray-200 dark:bg-secondary-dark-bg md:w-56 h-44 p-4 pt-9 rounded-2xl shadow-md">
+          <button
+                type="button"
+                style={{ color: '#03C9D7', backgroundColor: '#E5FAFB' }}
+                className="text-2xl opacity-0.9 rounded-full  p-4 hover:drop-shadow-xl"
+              >
+                <AiOutlineBell />
+              </button>
+            <p className="text-lg font-semibold mb-2">Crime Severity Assessment</p>
+            
+          </div>
+          
+
+          <div className="bg-white dark:text-gray-200 dark:bg-secondary-dark-bg md:w-56 h-44 p-4 pt-9 rounded-2xl shadow-md">
+          <button
+                type="button"
+                style={{ color: '#03C9D7', backgroundColor: '#E5FAFB' }}
+                className="text-2xl opacity-0.9 rounded-full  p-4 hover:drop-shadow-xl"
+              >
+                <AiOutlineStock />
+              </button>
+            <p className="text-lg font-semibold mb-2">Law Enforcement Performance Ratio</p>
             
           </div>
 
@@ -128,9 +144,9 @@ const Home = () => {
                 style={{ color: '#03C9D7', backgroundColor: '#E5FAFB' }}
                 className="text-2xl opacity-0.9 rounded-full  p-4 hover:drop-shadow-xl"
               >
-                <MdOutlineSupervisorAccount />
+                <AiOutlineHeatMap />
               </button>
-            <p className="text-lg font-semibold mb-2">Seasonal Crime Patterns</p>
+            <p className="text-lg font-semibold mb-2">Crime Trend Analysis</p>
             
           </div>
         </div>
@@ -151,12 +167,12 @@ const Home = () => {
             </button>
           </div>
           <div className="mt-6">
-          <button
+          {/* <button
   className="button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
   onClick={handleButtonClick}
 >
   Count
-</button>
+</button> */}
           </div>
         </div>
       </div>

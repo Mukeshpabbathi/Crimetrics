@@ -66,7 +66,7 @@ const Line4 = () => {
           <ul className="list-disc pl-6 mt-2">
             {crimeData.map(item => (
               <li key={`${singleCrime}-${item[1]}`}>
-                In {item[1]}, the total victim count for {singleCrime} was {item[3]}.
+                In {item[1]}, the total victim count for age group {item[2]} was {item[3]}.
               </li>
             ))}
           </ul>
@@ -88,7 +88,7 @@ const Line4 = () => {
           <ul className="list-disc pl-6 mt-2">
             {ageGroupData.map(item => (
               <li key={`${singleAgeGroup}-${item[1]}`}>
-                In {item[1]}, the total victim count for {singleAgeGroup} victims was {item[3]}.
+                In {item[1]}, the total victim count for {item[0]} was {item[3]}.
               </li>
             ))}
           </ul>
@@ -114,7 +114,7 @@ const Line4 = () => {
           <ul className="list-disc pl-6 mt-2">
             {ageGroupData.map(item => (
               <li key={`${singleAgeGroup}-${item[0]}-${item[1]}`}>
-                In {item[1]}, the total victim count for {singleAgeGroup} victims of {item[0]} was {item[3]}.
+                In {item[1]}, the total victim count for {item[0]} was {item[3]}.
               </li>
             ))}
           </ul>
@@ -124,77 +124,77 @@ const Line4 = () => {
       insights.push(ageGroupInsights);
   
     }
-    if (selectedCrimes.length === 1 && selectedAgeGroup.length > 1) {
-      const singleCrime = selectedCrimes[0];
-      const selectedAgeGroups = selectedAgeGroup;
+    // if (selectedCrimes.length === 1 && selectedAgeGroup.length > 1) {
+    //   const singleCrime = selectedCrimes[0];
+    //   const selectedAgeGroups = selectedAgeGroup;
   
-      const insightsForSelectedCrimeAndAgeGroups = selectedAgeGroups.map(ageGroup => {
-        const ageGroupData = data.filter(item => item[0] === singleCrime && item[2] === ageGroup);
+    //   const insightsForSelectedCrimeAndAgeGroups = selectedAgeGroups.map(ageGroup => {
+    //     const ageGroupData = data.filter(item => item[0] === singleCrime && item[2] === ageGroup);
   
-        if (ageGroupData.length === 0) {
-          return (
-            <p key={`no-data-${singleCrime}-${ageGroup}`}>
-              No data available for {singleCrime} and {ageGroup} age group.
-            </p>
-          );
-        }
+    //     if (ageGroupData.length === 0) {
+    //       return (
+    //         <p key={`no-data-${singleCrime}-${ageGroup}`}>
+    //           No data available for {singleCrime} and {ageGroup} age group.
+    //         </p>
+    //       );
+    //     }
   
-        return (
-          <div key={`crime-ageGroup-${singleCrime}-${ageGroup}`}>
-            <p>
-              The line chart above illustrates the age distribution of victims for {singleCrime} and {ageGroup}. Here are key insights:
-            </p>
-            <ul className="list-disc pl-6 mt-2">
-              {ageGroupData.map(item => (
-                <li key={`${singleCrime}-${ageGroup}-${item[1]}`}>
-                  In {item[1]}, the total victim count for {ageGroup} victims of {singleCrime} was {item[3]}.
-                </li>
-              ))}
-            </ul>
-          </div>
-        );
-      });
+    //     return (
+    //       <div key={`crime-ageGroup-${singleCrime}-${ageGroup}`}>
+    //         <p>
+    //           The line chart above illustrates the age distribution of victims for {singleCrime} and {ageGroup}. Here are key insights:
+    //         </p>
+    //         <ul className="list-disc pl-6 mt-2">
+    //           {ageGroupData.map(item => (
+    //             <li key={`${singleCrime}-${ageGroup}-${item[1]}`}>
+    //               In {item[1]}, the total victim count was {item[3]}.
+    //             </li>
+    //           ))}
+    //         </ul>
+    //       </div>
+    //     );
+    //   });
   
-      insights.push(...insightsForSelectedCrimeAndAgeGroups);
+    //   insights.push(...insightsForSelectedCrimeAndAgeGroups);
   
-    } 
+    // } 
   
-    if (selectedCrimes.length > 1 && selectedAgeGroup.length > 1) {
+    if (selectedCrimes.length > 0 && selectedAgeGroup.length > 1) {
       const years = Array.from(new Set(data.map(item => item[1])));
-      selectedAgeGroup.forEach(ageGroup => {
-        const ageGroupData = data.filter(item => selectedCrimes.includes(item[0]) && item[2] === ageGroup);
-  
-        if (ageGroupData.length === 0) {
+      selectedCrimes.forEach(crimeType => {
+        const crimeTypeData = data.filter(item => selectedAgeGroup.includes(item[2]) && item[0] === crimeType);
+    
+        if (crimeTypeData.length === 0) {
           insights.push(
-            <p key={`no-data-${ageGroup}`}>No data available for the selected crimes and {ageGroup} age group.</p>
+            <p key={`no-data-${crimeType}`}>No data available for {crimeType} crime and the selected age groups.</p>
           );
           return;
         }
-  
-        const ageGroupInsights = (
-          <div key={`ageGroup-${ageGroup}`}>
+    
+        const crimeTypeInsights = (
+          <div key={`crimeType-${crimeType}`}>
             <p>
-              The line chart above illustrates the age distribution of victims for {ageGroup}. Here are key insights:
+              The line chart above illustrates the impact of {crimeType} crime on different age groups. Here are key insights:
             </p>
             <ul className="list-disc pl-6 mt-2">
               {years.map(year => {
-                const yearData = ageGroupData.filter(item => item[1] === year);
+                const yearData = crimeTypeData.filter(item => item[1] === year);
                 if (yearData.length === 0) return null;
-  
-                const maxVictimCrime = yearData.reduce((max, crime) =>
-                  crime[3] > max[3] ? crime : max
+    
+                const maxVictimAgeGroup = yearData.reduce((max, ageGroup) =>
+                  ageGroup[3] > max[3] ? ageGroup : max
                 );
-                const minVictimCrime = yearData.reduce((min, crime) =>
-                  crime[3] < min[3] ? crime : min
+                const minVictimAgeGroup = yearData.reduce((min, ageGroup) =>
+                  ageGroup[3] < min[3] ? ageGroup : min
                 );
-  
+    
                 return (
-                  <li key={`${ageGroup}-${year}`}>
-                    In {year} for {ageGroup} victims:
-                    {maxVictimCrime[0] !== minVictimCrime[0] && (
+                  <li key={`${crimeType}-${year}`}>
+                    In {year} for {crimeType} crime:
+                    {maxVictimAgeGroup[2] !== minVictimAgeGroup[2] && (
                       <p>
-                        {maxVictimCrime[0]} had the highest total victim count ({maxVictimCrime[3]}), while{' '}
-                        {minVictimCrime[0]} had the lowest ({minVictimCrime[3]}).
+                        {maxVictimAgeGroup[2]} age group were the most affected with the total victim count ({maxVictimAgeGroup[3]}), while{' '}
+                        {minVictimAgeGroup[2]} age group were the least affected with the victim count ({minVictimAgeGroup[3]}).
                       </p>
                     )}
                   </li>
@@ -203,10 +203,11 @@ const Line4 = () => {
             </ul>
           </div>
         );
-  
-        insights.push(ageGroupInsights);
+    
+        insights.push(crimeTypeInsights);
       });
     }
+    
   
     return insights;
   };
@@ -232,13 +233,22 @@ const Line4 = () => {
           options={AgeGroupOptions}
           value={AgeGroupOptions.filter(option => selectedAgeGroup.includes(option.value))}
           onChange={handleAgeGroupChange}
-          placeholder="Select Age Group"
+          placeholder="Select Age Groups"
           styles={customStyles}
         />
         
       </div>
       <LineChart4 data={data} selectedCrimes={selectedCrimes} selectedAgeGroup={selectedAgeGroup} />
       <div className="mt-6">
+      <h2 className="text-xl font-semibold mb-2">Description</h2>
+      <p style={{ marginBottom: '10px' }}>
+        This trend explores the relationship between victim's age and
+        crime specificity. It compare the victimization rates for various age groups to
+        identify if there are age-specific vulnerabilities.
+         By examining changes in the age distribution of crime victims over time, law enforcement can 
+         allocate resources more effectively. If there is a noticeable shift in victim demographics, 
+         resources can be directed towards areas or communities where certain age groups are more at risk.
+      </p>
         <h2 className="text-xl font-semibold mb-2">Age Distribution Analysis</h2>
         {generateAgeDistributionInsights()}
       </div>

@@ -26,7 +26,7 @@ const Ecommerce = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/getNumTuples');
+        const response = await fetch('http://localhost:3001/api/getNum');
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -121,7 +121,7 @@ const Ecommerce = () => {
               >
                 <MdOutlineSupervisorAccount />
               </button>
-            <p className="text-lg font-semibold mb-2">Crime Category</p>
+            <p className="text-lg font-semibold mb-2">Crime Severity Assessment</p>
             
           </div>
 

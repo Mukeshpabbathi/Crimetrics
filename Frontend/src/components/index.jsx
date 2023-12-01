@@ -18,4 +18,5 @@ export { default as LineChart5 } from './Charts/LineChart5';
 export { default as LineChart3 } from './Charts/LineChart3';
 export { default as LineChart4 } from './Charts/LineChart4';
 export { default as LineChart2 } from './Charts/LineChart2';
+export { default as LineChart6 } from './Charts/LineChart6';
 

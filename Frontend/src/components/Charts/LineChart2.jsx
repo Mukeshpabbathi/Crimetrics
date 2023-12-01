@@ -12,15 +12,16 @@ import {
 import { LinePrimaryXAxis, LinePrimaryYAxis } from '../../data/dummy'; // Import your dummy data and axes configurations
 import { useStateContext } from '../../contexts/ContextProvider';
 
-const LineChart2 = ({ data, selectedCrimeCodes }) => {
+const LineChart2 = ({ data, selectedareacode, selectedcrimecode  }) => {
   const { currentMode } = useStateContext();
 
   // Filter data based on selected crime codes
-  const filteredData = data.filter(item => selectedCrimeCodes.includes(item.crimeCode));
+  const filteredDataInitial = data.filter(item => selectedareacode.includes(item[4]));
+  const filteredData = selectedcrimecode.length === 0 ? filteredDataInitial : filteredDataInitial.filter(item => selectedcrimecode.includes(item[5]));
 
   // Group data by policeAreaCode and crimeYear
   const groupedData = filteredData.reduce((acc, item) => {
-    const key = [item.policeAreaCode, item.crimeYear];
+    const key = [item[4],item[5]];
 
     if (!acc[key]) {
       acc[key] = [];
@@ -34,14 +35,13 @@ const LineChart2 = ({ data, selectedCrimeCodes }) => {
   const lineCustomSeries = [];
 
   Object.keys(groupedData).forEach((key, index) => {
-    const [policeAreaCode, crimeYear] = key;
     
     let chartData = groupedData[key].map((item) => ({
-      x: new Date(crimeYear, 0, 1),
-      y: item.crimesCount,
+      x: new Date(item[1], 0, 1),
+      y: item[3],
     }));
 
-    if (selectedCrimeCodes.length === 0) {
+    if (selectedareacode.length === 0 || selectedcrimecode === 0) {
       chartData = [];
     } else {
       lineChartData.push(chartData);
@@ -51,7 +51,7 @@ const LineChart2 = ({ data, selectedCrimeCodes }) => {
       dataSource: chartData,
       xName: 'x',
       yName: 'y',
-      name: `Area ${policeAreaCode}`,
+      name: key,
       width: '2',
       marker: { visible: true, width: 10, height: 10 },
       type: 'Line',

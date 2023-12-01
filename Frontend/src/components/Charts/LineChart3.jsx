@@ -42,12 +42,12 @@ const LineChart3 = ({ data, selectedMocodes }) => {
     }));
 console.log(chartData)
 
-if (selectedMocodes.length === 0){
-    chartData = [];
-}
-else {
+// if (selectedMocodes.length === 0){
+//     chartData = [];
+// }
+// else {
     lineChartData.push(chartData);
-}
+// }
     const series = {
       dataSource: chartData,
       xName: 'x',
@@ -67,12 +67,12 @@ else {
       height="420px"
       primaryXAxis={LinePrimaryXAxis}
       primaryYAxis={{
-        title: 'Crime Count',
+        title: 'Mo Code Count',
       }}
       chartArea={{ border: { width: 0 } }}
       tooltip={{ enable: true }}
       background={currentMode === 'Dark' ? '#33373E' : '#fff'}
-      legendSettings={{ background: 'white', visible: selectedMocodes.length > 0 }}
+      legendSettings={{ background: 'white' }}
     >
       <Inject services={[LineSeries, DateTime, Legend, Tooltip]} />
       <SeriesCollectionDirective>

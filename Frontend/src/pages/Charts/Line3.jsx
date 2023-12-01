@@ -44,7 +44,7 @@ const Line3 = () => {
   
         return (
           <li key={`${singleMocode}-${year}`}>
-            In {year}, the crime count for Mocode {singleMocode} was {crimeCount}. {/* Customize this based on your data structure */}
+            In {year}, the frequency of Mocode {singleMocode} was more involved in several crimes was {crimeCount}. {/* Customize this based on your data structure */}
           </li>
         );
       });
@@ -80,7 +80,7 @@ const Line3 = () => {
           In {year}:
           {maxCrimeMocode.mocode !== minCrimeMocode.mocode && (
             <p>
-              {maxCrimeMocode.mocode} had the highest crime count, while  {minCrimeMocode.mocode} had the lowest.
+              {maxCrimeMocode.mocode} was involved more frequently, while  {minCrimeMocode.mocode} had the lowest frequency of occurance.
             </p>
           )}
         </li>
@@ -121,6 +121,14 @@ const Line3 = () => {
       </div>
       <LineChart3 data={data} selectedMocodes={selectedMocodes} />
       <div className="mt-6">
+      <h2 className="text-xl font-semibold mb-2">Description</h2>
+        <p style={{ marginBottom: '10px' }}>
+        The Mocode Analysis focuses on the modus operandi (MO) of criminals by identifying
+        the top 30 most frequently used MO codes (Mocodes) in crimes. The graph represents the historical
+        trends of these MOs over the past decade to observe how criminals' methods have evolved over
+        time. This analysis can provide insights into changing criminal behavior patterns, helping law
+        enforcement agencies adapt their strategies and tactics accordingly.
+        </p>
         <h2 className="text-xl font-semibold mb-2">Mocode Analysis</h2>
         {generateMocodeInsights()}
       </div>

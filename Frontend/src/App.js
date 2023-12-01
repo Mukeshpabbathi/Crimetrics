@@ -3,20 +3,23 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { FiSettings } from 'react-icons/fi';
 import { TooltipComponent } from '@syncfusion/ej2-react-popups';
 
+
 import { Navbar, Footer, Sidebar, ThemeSettings } from './components';
 // import { Ecommerce, Home, Line, Area, Bar, Pie, Financial } from './pages';
-import { Ecommerce, Home, Line, Area,Line2, Line4, Line5, Line3 } from './pages';
+import { Ecommerce, Home, Line, Area,Line2, Line4, Line5, Line3, Line6 } from './pages';
 // Example of correct import assuming Login is a component in './pages'
 import Login from './pages/Login';
-
+import { useState } from 'react';
 
 import './App.css';
 
 import { useStateContext } from './contexts/ContextProvider';
 
+
+
 const App = () => {
   const { setCurrentColor, setCurrentMode, currentMode, activeMenu, currentColor, themeSettings, setThemeSettings } = useStateContext();
-
+  const [isLoggedIn, setIsLoggedIn] = useState(window.localStorage.getItem("loggedin") === "TRUE");
   useEffect(() => {
     const currentThemeColor = localStorage.getItem('colorMode');
     const currentThemeMode = localStorage.getItem('themeMode');
@@ -27,6 +30,7 @@ const App = () => {
   }, []);
 
   return (
+    
     <div className={currentMode === 'Dark' ? 'dark' : ''}>
       <BrowserRouter>
         <div className="flex relative dark:bg-main-dark-bg">
@@ -71,11 +75,12 @@ const App = () => {
               <Routes>
                 {/* dashboard  */}
                 <Route path="/Home" element={<Home />} />
-                
+                <Route path="/" element={<Login />} />
 
                 {/* charts  */}
                 <Route path="/Crime Trend Analysis" element={<Line />} />
-                <Route path="/Crime Category" element={<Line2 />} />
+                <Route path="/Law Enforcement Performance Ratio" element={<Line6 />} />
+                <Route path="/Crime Severity Assessment" element={<Line2 />} />
                 <Route path="/Modus Operandi Analysis" element={<Line3 />} />
                 <Route path="/Age Distribution of Victims" element={<Line4 />} />
                 <Route path="/Seasonal Crime Patterns" element={<Line5 />} />

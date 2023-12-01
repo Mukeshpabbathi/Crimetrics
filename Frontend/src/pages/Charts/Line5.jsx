@@ -66,7 +66,7 @@ const Line5 = () => {
           <ul className="list-disc pl-6 mt-2">
             {crimeData.map(item => (
               <li key={`${singleCrime}-${item[1]}`}>
-                In {item[1]}, the total crime count for {singleCrime} was {item[3]}.
+                In {item[1]} {item[0]}, the total crime count was {item[3]}.
               </li>
             ))}
           </ul>
@@ -80,13 +80,13 @@ const Line5 = () => {
       if (seasonData.length === 0) {
         return (
           <p key={`no-data-${singleSeason}`}>
-            No data available for the selected age group and {singleSeason}.
+            No data available for the selected season.
           </p>
         );
       }
     }
     
-    if (selectedCrimes.length > 0 && selectedSeason.length > 0) {
+    if (selectedCrimes.length === 1 && selectedSeason.length === 1) {
       const insightsForSelectedCrimesAndSeasons = selectedCrimes.map(crime => {
         return selectedSeason.map(season => {
           const crimeSeasonData = data.filter(item => item[2] === crime && item[1] === season);
@@ -107,7 +107,7 @@ const Line5 = () => {
               <ul className="list-disc pl-6 mt-2">
                 {crimeSeasonData.map(item => (
                   <li key={`${crime}-${season}-${item[0]}`}>
-                    In {item[0]}, the total crime count for {crime} was {item[3]}.
+                    In {item[0]}, the total crime count was {item[3]}.
                   </li>
                 ))}
               </ul>
@@ -119,7 +119,55 @@ const Line5 = () => {
       insights.push(...insightsForSelectedCrimesAndSeasons);
     }
     
-  
+    if (selectedCrimes.length > 0 && selectedSeason.length > 1) {
+      const years = Array.from(new Set(data.map(item => item[0])));
+      selectedCrimes.forEach(crimeType => {
+        const crimeTypeData = data.filter(item => selectedSeason.includes(item[1]) && item[2] === crimeType);
+    
+        if (crimeTypeData.length === 0) {
+          insights.push(
+            <p key={`no-data-${crimeType}`}>No data available for {crimeType} crime and the selected seasons.</p>
+          );
+          return;
+        }
+    
+        const crimeTypeInsights = (
+          <div key={`crimeType-${crimeType}`}>
+            <p>
+              The line chart above illustrates the impact on {crimeType} crime inn different seasons. Here are key insights:
+            </p>
+            <ul className="list-disc pl-6 mt-2">
+              {years.map(year => {
+                const yearData = crimeTypeData.filter(item => item[0] === year);
+                if (yearData.length === 0) return null;
+        
+                const maxVictimSeason = yearData.reduce((max, season) =>
+                  season[3] > max[3] ? season : max
+                );
+                const minVictimSeason = yearData.reduce((min, season) =>
+                  season[3] < min[3] ? season : min
+                );
+                console.log(maxVictimSeason)
+                return (
+                  <li key={`${crimeType}-${year}`}>
+                    In {year} for {crimeType} crime:
+                    {maxVictimSeason[1] !== minVictimSeason[1] && (
+                      <p>
+                        {maxVictimSeason[1]} had the highest total crime rate with total count ({maxVictimSeason[3]}), while{' '}
+                        {minVictimSeason[1]} had the lowest crime rate ({minVictimSeason[3]}).
+                      </p>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        );
+        
+    
+        insights.push(crimeTypeInsights);
+      });
+    };
     
   
     return insights;
@@ -147,12 +195,20 @@ const Line5 = () => {
           options={SeasonOptions}
           value={SeasonOptions.filter((option) => selectedSeason.includes(option.value))}
           onChange={handleSeasonChange}
-          placeholder="Select Season"
+          placeholder="Select Seasons"
           styles={customStyles}
         />
       </div>
       <LineChart5 data={data} selectedCrimes={selectedCrimes} selectedSeason={selectedSeason} />
       <div className="mt-6">
+        <h2 className="text-xl font-semibold mb-2">Description</h2>
+        <p style={{ marginBottom: '10px' }}>
+        This chart explores the relationship between the types of crime and the season they occur. 
+        This graph helps to understand how certain types of crime are more likely to occur in specific 
+        seasons and how these crimes have evolved over the years. This information helps in allocating resources more efficiently during 
+        high-risk periods, allowing police to enhance patrols and implement preventive measures when certain 
+        crimes are more likely to occur. 
+        </p>
         <h2 className="text-xl font-semibold mb-2">Seasonal Crime Analysis</h2>
         {generateSeasonalCrimeInsights()}
       </div>
